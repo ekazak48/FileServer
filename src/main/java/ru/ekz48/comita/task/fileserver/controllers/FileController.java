@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import ru.ekz48.comita.task.fileserver.services.FileStorageService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/file")
@@ -26,8 +28,9 @@ public class FileController {
     }
 
     @GetMapping("/")
-    public List<String> getFileNames() {
-        return null;
+    public ResponseEntity<List<String>> getFileNames() {
+        List<String> fileList = fileStorageService.listAll().map(path -> path.getFileName().toString()).toList();
+        return new ResponseEntity<>(fileList, HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/upload")

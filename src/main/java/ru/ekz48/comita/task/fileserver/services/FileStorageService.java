@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FileStorageService {
@@ -21,8 +23,15 @@ public class FileStorageService {
         this.rootLocation = Paths.get(uploadLocation);
     }
 
-    public List<String> getFileNames() {
-        return null;
+    public Stream<Path> listAll() {
+        try {
+            return Files
+                    .walk(this.rootLocation, 1)
+                    .filter(path -> !path.equals(this.rootLocation))
+                    .map(this.rootLocation::relativize);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void store(MultipartFile file) {
