@@ -9,17 +9,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/file")
 public class FileController {
 
-    @GetMapping("/getNames")
+    private FileStorageService fileStorageService;
+
+    public FileController(@Autowired FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
+    }
+
+    @GetMapping("/")
     public List<String> getFileNames() {
         return null;
     }
 
     @PostMapping("/upload")
-    public void uploadFile() {}
+    public ResponseEntity<String> uploadFile(@RequestParam MultipartFile file) {
+
+        fileStorageService.store(file);
+
+        return new ResponseEntity<>("file was uploaded", HttpStatusCode.valueOf(200));
+    }
 
     @GetMapping("/getFile/{name}")
     public String getFile(@PathVariable String name) {

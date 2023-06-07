@@ -1,0 +1,4 @@
+
+app:
+  fileStorage:
+    rootFolder: ./files
