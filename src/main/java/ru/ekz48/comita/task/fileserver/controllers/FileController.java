@@ -35,22 +35,33 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam MultipartFile file) {
-
-        fileStorageService.store(file);
+        try {
+            fileStorageService.store(file);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("error: " + e.getMessage(), HttpStatusCode.valueOf(400));
+        }
 
         return new ResponseEntity<>("file was uploaded", HttpStatusCode.valueOf(200));
     }
 
     @GetMapping("/getFile/{name:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String name) {
+        Resource file;
+        try {
+            file = fileStorageService.loadAsResource(name);
 
-        Resource file = fileStorageService.loadAsResource(name);
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "" + "\"").body(file);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "" + "\"")
+                    .body(file);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatusCode.valueOf(404)).build();
+        }
     }
 
-    @DeleteMapping("/delete/{name}")
+    @DeleteMapping("/delete/{name:.+}")
     public void deleteFile(@PathVariable String name) {
-
+        fileStorageService.deleteFile(name);
     }
 
 

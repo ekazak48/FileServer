@@ -35,32 +35,42 @@ public class FileStorageService {
         }
     }
 
-    public Resource loadAsResource(String filename) {
+    public Resource loadAsResource(String filename) throws RuntimeException {
         Path file = rootLocation.resolve(filename);
         try {
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
-            } else throw  new RuntimeException();
+            } else throw new RuntimeException("Не получилось получить содержимое файла");
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Не получилось найти файл");
         }
     }
 
-    public void store(MultipartFile file) {
+    public void store(MultipartFile file) throws RuntimeException {
         if (file.isEmpty()) {
-            //TODO: exception, that file is empty
+            throw new RuntimeException("Файл пуст, не получилось загрузить");
         }
         Path dest = this.rootLocation.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
         if (!dest.getParent().equals(this.rootLocation.toAbsolutePath())) {
-            //TODO: exception, that cannot store file here
+            throw new RuntimeException("Путь сохранения файла не существует");
         }
         try (InputStream inputStream = file.getInputStream()){
             Files.copy(inputStream, dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            //TODO: own exception
-            throw new RuntimeException(e);
+            throw new RuntimeException("Произошла ошибка при загрузке файла на сервер");
         }
+    }
+
+    public void deleteFile(String fileName) {
+        Path file = rootLocation.resolve(fileName);
+        try {
+            Files.delete(file);
+        } catch (IOException e) {
+            throw new RuntimeException("Произошла ошибка удаления файла");
+        }
+
+
     }
 
 
