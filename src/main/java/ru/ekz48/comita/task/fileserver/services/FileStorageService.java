@@ -62,7 +62,7 @@ public class FileStorageService {
         }
     }
 
-    public void deleteFile(String fileName) {
+    public void deleteFile(String fileName) throws RuntimeException {
         Path file = rootLocation.resolve(fileName);
         try {
             Files.delete(file);

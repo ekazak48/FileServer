@@ -60,8 +60,13 @@ public class FileController {
     }
 
     @DeleteMapping("/delete/{name:.+}")
-    public void deleteFile(@PathVariable String name) {
-        fileStorageService.deleteFile(name);
+    public ResponseEntity<String> deleteFile(@PathVariable String name) {
+        try {
+            fileStorageService.deleteFile(name);
+            return ResponseEntity.status(200).body("удалено успешно");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("произошла ошибка. Возможно файла нет");
+        }
     }
 
 
